@@ -25,6 +25,18 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "router": {
+        "appRoot": "src/app"
+      },
+      "eas": {
+        "projectId": "e16db728-7b33-42b7-ba4b-0e26ee42816f"
+      }
+    },
+    "owner": "harrisom"
   }
 }

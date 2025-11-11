@@ -35,6 +35,16 @@ Results are saved for later review.
 
 ---
 
+## Project Structure
+- `src/app/_layout.tsx`: Expo Router stack host + SafeAreaProvider configuration.
+- `src/app/index.tsx`: current MVP storyboard describing the end-to-end scan flow.
+- `src/components/*`: shareable UI primitives (CTA button, section heading, feature cards).
+- `src/lib/features.ts`: single source of truth for the onboarding/scan/user stories rendered in the UI.
+
+With `expo-router/entry` as the app entry point and `app.json` pointing `extra.router.appRoot` to `src/app`, new screens can be added simply by creating new files/folders under that directory (e.g., `src/app/(auth)/login.tsx`, `src/app/(tabs)/camera.tsx`, etc.).
+
+---
+
 ## UX / UI
 - Single-pass flow: **Scan → Translate → Review → Save**
 - “Food Info Card” layout per scan:
@@ -92,3 +102,14 @@ pnpm run start
 # or
 pnpm run ios
 pnpm run android
+```
+
+### Environment Variables
+1. Copy `.env.example` to `.env` and fill in your keys (Expo token, Firebase config, Google APIs, OAuth client IDs).
+2. Prefix any values that must be accessible in the client bundle with `EXPO_PUBLIC_`.
+3. For CI/EAS builds, mirror the same secrets via `eas secret:create --scope project --name <NAME> --value <VALUE>`.
+
+### Continuous Integration
+- GitHub Actions workflow (`.github/workflows/ci.yml`) runs pnpm install + TypeScript checks on every push/PR.
+- When `EXPO_TOKEN`, `EXPO_USERNAME`, `EXPO_PASSWORD` secrets are configured in the repo, the `eas-preview` job triggers `eas build --platform android --profile preview --non-interactive` to ship an APK artifact.
+- Extend the workflow with lint/tests (e.g., `pnpm run lint`, Jest) once those scripts exist.

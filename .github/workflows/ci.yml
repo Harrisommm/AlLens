@@ -1,0 +1,80 @@
+name: expo-smoke
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  smoke:
+    name: Expo dev server smoke test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Verify EXPO_TOKEN is configured
+        run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "Missing EXPO_TOKEN secret. Follow https://docs.expo.dev/eas-update/github-actions/#publish-previews-on-pull-requests to create one."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.20.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Setup Expo CLI
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Launch Expo dev server (background)
+        run: |
+          set -eux
+          expo start --offline --dev-client --non-interactive --max-workers 1 > expo.log 2>&1 &
+          echo $! > expo.pid
+
+      - name: Wait for Expo to report ready state
+        run: |
+          set -eux
+          for i in $(seq 1 30); do
+            if grep -q "Metro waiting on" expo.log; then
+              exit 0
+            fi
+            if ! ps -p "$(cat expo.pid)" > /dev/null 2>&1; then
+              echo "Expo process exited early"
+              cat expo.log
+              exit 1
+            fi
+            sleep 2
+          done
+          echo "Expo server did not report ready state within timeout"
+          cat expo.log
+          exit 1
+
+      - name: Stop Expo dev server
+        if: always()
+        run: |
+          if [ -f expo.pid ]; then
+            kill "$(cat expo.pid)" || true
+          fi
+          if [ -f expo.log ]; then
+            echo "----- Expo log -----"
+            cat expo.log
+          fi
