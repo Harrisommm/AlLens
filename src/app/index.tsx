@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { FeatureCard } from '../components/FeatureCard';
@@ -16,9 +16,9 @@ export default function HomeScreen() {
           Social login → camera → OCR → translation → allergy highlights. Everything you shared in
           the spec captured in one loop.
         </Text>
-        <PrimaryButton label="Start scan flow" onPress={() => {}} />
-        <Link href="/" style={styles.linkText}>
-          Placeholder route • camera view coming soon
+        <PrimaryButton label="Start scan flow" onPress={() => router.push('/camera')} />
+        <Link href="/(auth)/login" style={styles.linkText}>
+          Go to login storyboard
         </Link>
       </View>
 
