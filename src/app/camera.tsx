@@ -94,19 +94,29 @@ export default function CameraScreen() {
       <CameraView ref={cameraRef} style={styles.camera} facing={facing} />
       <View style={styles.overlay}>
         <View style={styles.topBar}>
-          <TouchableOpacity onPress={() => router.push('/' as const)}>
-            <Text style={styles.topBarLink}>← Storyboard</Text>
+          <TouchableOpacity onPress={() => router.push('/history')}>
+            <Text style={styles.topBarLink}>History</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setFacing((prev) => (prev === 'back' ? 'front' : 'back'))}>
             <Text style={styles.topBarLink}>Flip</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.bottomBar}>
+          <TouchableOpacity onPress={() => router.push('/(setup)/allergies')}>
+            <Text style={styles.bottomLink}>User info</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.shutter} onPress={handleCapture} disabled={isProcessing}>
             {isProcessing ? <ActivityIndicator color="#0f172a" /> : null}
           </TouchableOpacity>
-          {status ? <Text style={styles.status}>{status}</Text> : null}
+          <TouchableOpacity onPress={() => router.push('/')}>
+            <Text style={styles.bottomLink}>Flow</Text>
+          </TouchableOpacity>
         </View>
+        {status ? (
+          <View style={styles.statusBubble}>
+            <Text style={styles.status}>{status}</Text>
+          </View>
+        ) : null}
       </View>
     </View>
   );
@@ -135,8 +145,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bottomBar: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    marginBottom: 16,
   },
   shutter: {
     width: 76,
@@ -147,6 +160,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(248,250,252,0.6)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  statusBubble: {
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    marginBottom: 20,
   },
   status: {
     color: '#f8fafc',
@@ -168,5 +189,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#475569',
     lineHeight: 22,
+  },
+  bottomLink: {
+    color: '#f8fafc',
+    fontSize: 14,
   },
 });
